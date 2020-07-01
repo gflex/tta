@@ -1,0 +1,46 @@
+---
+- name: configure machine for wordpress web server
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  vars:
+    wp_dir: "/var/www/html"
+    admin_mail: "noreplay@noreply.com"
+  tasks:
+    - name: install needed software
+      yum:
+        name:
+          - httpd
+          - python2-pip
+          - mysql
+        state: installed
+    - name: install pip packages
+      pip:
+        name:
+          - boto3
+          - botocore
+          - PyMySQL
+    - name: collect data from ssm
+      set_fact:
+        wp_db: "{{ lookup('aws_ssm', '/rbt/app/wordpress/wp_db_user', region='eu-central-1', shortnames=true, bypath=true, recursive=true) }}"
+        wp_db_name: "{{ lookup('aws_ssm', '/rbt/app/wordpress/db', region='eu-central-1', shortnames=true, bypath=true, recursive=true) }}"
+        wp_admin: "{{ lookup('aws_ssm', '/rbt/app/wordpress/wp_admin', region='eu-central-1', shortnames=true, bypath=true, recursive=true) }}"
+    - name: install and configure wordpress
+      shell: "{{ item }}"
+      with_items:
+        - "amazon-linux-extras install -y epel php7.3"
+        - "yum install -y wp-cli"
+        - "/usr/bin/wp --path={{ wp_dir }} core download"
+        - "/usr/bin/wp --path={{ wp_dir }} core config --dbname={{ wp_db_name.name }} --dbuser={{ wp_db.user }} --dbpass=\'{{ wp_db.password }}\' --dbhost={{ wp_db_name.host }} --dbprefix=wp_"
+        - "/usr/bin/wp --path={{ wp_dir }} core install --url={{ wp_db.url }} --title=wordpress --admin_user={{ wp_admin.user }} --admin_password=\'{{ wp_admin.password }}\' --admin_email={{ admin_mail }}"
+        - "chown -R ec2-user:apache /var/www"
+        - "find /var/www -type d -exec chmod 2775 {} \\;"
+        - "chmod 2775 /var/www"
+        - "find /var/www -type f -exec chmod 0664 {} \\;"
+    - name: start httpd
+      service:
+        name: httpd
+        state: restarted
+        enabled: yes
+
+

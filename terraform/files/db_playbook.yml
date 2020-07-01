@@ -1,0 +1,85 @@
+---
+- name: configure machine for db host
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  vars:
+    - db_dir: "/var/lib/mysql"
+    - mysql_user: "mysql"
+    - mysql_group: "mysql"
+  tasks:
+    - name: create file system
+      filesystem:
+        dev: /dev/xvdh
+        fstype: ext4
+    - name: mount FS
+      mount:
+        src: /dev/xvdh
+        path: '{{ db_dir }}'
+        state: mounted
+        fstype: ext4
+    - name: install mariadb
+      yum:
+        name:
+          - mariadb-server
+          - python2-pip
+        state: installed
+    - name: chown_db_dir
+      file:
+        path: '{{ db_dir }}'
+        owner: '{{ mysql_user }}'
+        group: '{{ mysql_group }}'
+        mode: '1755'
+    - name: start mariadb server
+      service:
+        name: mariadb
+        state: started
+        enabled: yes
+    - name: install pip packages
+      pip:
+        name:
+          - boto3
+          - botocore
+          - PyMySQL
+    - name: collect data from ssm
+      set_fact:
+        db_root: "{{ lookup('aws_ssm', '/rbt/db/mysql/db_root_user', region='eu-central-1', shortnames=true, bypath=true, recursive=true) }}"
+        wp_db: "{{ lookup('aws_ssm', '/rbt/app/wordpress/wp_db_user', region='eu-central-1', shortnames=true, bypath=true, recursive=true) }}"
+        wp_db_name: "{{ lookup('aws_ssm', '/rbt/app/wordpress/db', region='eu-central-1', shortnames=true, bypath=true, recursive=true) }}"
+
+    - name: create db and user
+      block:
+        - name: try connection to localhost SQL DB
+          mysql_db:
+            login_user: "{{ wp_db.user }}"
+            login_password: "{{ wp_db.password }}"
+            name: "{{ wp_db_name.name }}"
+            connect_timeout: 10
+      rescue:
+        - name: create DB admin user
+          mysql_user:
+            check_implicit_admin: yes
+            connect_timeout: 10
+            name: "{{ db_root.user }}"
+            password: "{{ db_root.password }}"
+            priv: "*.*:ALL,GRANT"
+            state: present
+
+        - name: create DB
+          mysql_db:
+            login_user: "{{ db_root.user }}"
+            login_password: "{{ db_root.password }}"
+            name: "{{ wp_db_name.name }}"
+            state: present
+
+        - name: create user
+          mysql_user:
+            check_implicit_admin: yes
+            name: "{{ wp_db.user }}"
+            password: "{{ wp_db.password }}"
+            priv: "{{ wp_db_name.name }}.*:ALL,GRANT"
+            host: "{{ item }}"
+            state: present
+          with_items:
+            - "%"
+            - "localhost"
