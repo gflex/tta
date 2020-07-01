@@ -46,7 +46,7 @@
         db_root: "{{ lookup('aws_ssm', '/rbt/db/mysql/db_root_user', region='eu-central-1', shortnames=true, bypath=true, recursive=true) }}"
         wp_db: "{{ lookup('aws_ssm', '/rbt/app/wordpress/wp_db_user', region='eu-central-1', shortnames=true, bypath=true, recursive=true) }}"
         wp_db_name: "{{ lookup('aws_ssm', '/rbt/app/wordpress/db', region='eu-central-1', shortnames=true, bypath=true, recursive=true) }}"
-
+      no_log: True
     - name: create db and user
       block:
         - name: try connection to localhost SQL DB
