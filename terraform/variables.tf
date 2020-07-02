@@ -40,7 +40,7 @@ variable "app_inst_type" {
 
 variable "db_root_user" {
   description = "username for the db"
-  default = "dbadmin"
+  default = "root"
 }
 
 variable "db_wp_user" {

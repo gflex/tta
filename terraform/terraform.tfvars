@@ -15,7 +15,7 @@ public_nets = {
 
 private_nets = {
   app : {
-    app_net_1: {
+    app_net_1 : {
       cidr = "10.13.3.0/24"
       avz  = "avz1"
     },
