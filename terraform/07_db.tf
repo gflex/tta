@@ -76,7 +76,7 @@ resource "aws_instance" "db_host" {
   subnet_id              = module.rds_subnets.subnets_ids.0
   iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
   availability_zone      = local.avz_map.avz1
-  key_name               = aws_key_pair.deployer.key_name
+  //key_name               = aws_key_pair.deployer.key_name
   user_data_base64       = base64encode(data.template_file.tpl_db_user_data.rendered)
   volume_tags            = merge({ "Name" : "${var.project}_ebs_db_vol" }, local.common_tags)
   tags                   = merge({ "Name" : "${var.project}_db_host" }, local.common_tags)

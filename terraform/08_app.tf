@@ -41,7 +41,7 @@ resource "aws_launch_template" "lt_app" {
     enabled = true
   }
   vpc_security_group_ids = [aws_security_group.sg_app.id]
-  key_name               = aws_key_pair.deployer.key_name
+  //key_name               = aws_key_pair.deployer.key_name
   user_data              = base64encode(data.template_file.tpl_app_user_data.rendered)
   tag_specifications {
     resource_type = "volume"
