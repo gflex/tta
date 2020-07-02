@@ -116,7 +116,6 @@ resource "aws_autoscaling_group" "asg" {
     id      = aws_launch_template.lt_app.id
     version = "$Latest"
   }
-  depends_on = [aws_instance.db_host]
   tag {
     key = "project"
     value = var.project
