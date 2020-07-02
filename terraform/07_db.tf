@@ -79,7 +79,7 @@ resource "aws_instance" "db_host" {
   //key_name               = aws_key_pair.deployer.key_name
   user_data_base64       = base64encode(data.template_file.tpl_db_user_data.rendered)
   volume_tags            = merge({ "Name" : "${var.project}_ebs_db_vol" }, local.common_tags)
-  tags                   = merge({ "Name" : "${var.project}_db_host" }, local.common_tags)
+  tags                   = local.common_tags
 }
 
 ## Create persistent EBS volume for DB
