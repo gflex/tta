@@ -117,6 +117,16 @@ resource "aws_autoscaling_group" "asg" {
     version = "$Latest"
   }
   depends_on = [aws_instance.db_host]
+  tag {
+    key = "project"
+    value = var.project
+    propagate_at_launch = true
+  }
+  tag {
+    key = "applicant"
+    propagate_at_launch = true
+    value = var.applicant
+  }
 }
 
 resource "aws_ssm_parameter" "blog_post" {
