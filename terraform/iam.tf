@@ -17,6 +17,16 @@ resource "aws_iam_role_policy_attachment" "ec2_common_ssm_ro" {
   role = aws_iam_role.ec2_common_role.name
 }
 
+## Create and attach ec2 tagging policy
+resource "aws_iam_policy" "ec2_tagging" {
+  policy = data.template_file.iam_policy_ec2_tag.rendered
+}
+
+resource "aws_iam_role_policy_attachment" "attach_ec2_tagging" {
+  policy_arn = aws_iam_policy.ec2_tagging.arn
+  role = aws_iam_role.ec2_common_role.id
+}
+
 ## Create ec2 instance role based on the ec2_common_role
 resource "aws_iam_instance_profile" "ec2_instance_profile" {
   role = aws_iam_role.ec2_common_role.name
