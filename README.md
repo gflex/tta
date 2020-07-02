@@ -42,6 +42,6 @@ Steps:
 
 Due to the needed time for actual bootstrap process, service might need some time to start. During that time you may see `502 Bad Gateway` error. Try refreshing in couple of minutes.
 
-Destroing everything including the built infra is as easy as:
+Destroying everything including the built infra is as easy as:
 `terraform destroy`
 
