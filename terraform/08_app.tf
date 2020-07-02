@@ -2,7 +2,7 @@
 resource "aws_ssm_parameter" "app_ansible_play" {
   name  = "/rbt/app/wordpress/setup/ansible"
   type  = "String"
-  value = filebase64("files/app_wp_playbook.yml")
+  value = base64encode(data.template_file.tpl_ansible_app.rendered)
 }
 
 # write wp_admin username to SSM
@@ -42,7 +42,7 @@ resource "aws_launch_template" "lt_app" {
   }
   vpc_security_group_ids = [aws_security_group.sg_app.id]
   key_name               = aws_key_pair.deployer.key_name
-  user_data              = filebase64("files/app_user_data.sh")
+  user_data              = base64encode(data.template_file.tpl_app_user_data.rendered)
   tag_specifications {
     resource_type = "volume"
     tags          = merge({ "Name" : "${var.project}_app_volume" }, local.common_tags)

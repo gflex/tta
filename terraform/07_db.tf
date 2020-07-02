@@ -63,7 +63,7 @@ resource "aws_ssm_parameter" "ssm_wp_db_host" {
 resource "aws_ssm_parameter" "ssm_ansible_db_playbook" {
   name  = "/${var.project}/db/setup/ansible"
   type  = "String"
-  value = filebase64("files/db_playbook.yml")
+  value = base64encode(data.template_file.tpl_ansible_db.rendered)
   tags  = local.common_tags
 }
 
@@ -77,7 +77,7 @@ resource "aws_instance" "db_host" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
   availability_zone      = local.avz_map.avz1
   key_name               = aws_key_pair.deployer.key_name
-  user_data_base64       = filebase64("files/db_user_data.sh")
+  user_data_base64       = base64encode(data.template_file.tpl_db_user_data.rendered)
   volume_tags = merge({ "Name" : "${var.project}_ebs_db_host" }, local.common_tags)
   tags        = merge({ "Name" : "${var.project}_db_host" }, local.common_tags)
 }

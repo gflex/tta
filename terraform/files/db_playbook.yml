@@ -4,7 +4,7 @@
   connection: local
   gather_facts: no
   vars:
-    - db_dir: "/var/lib/mysql"
+    - db_dir: "${DB_ROOT_DIR}"
     - mysql_user: "mysql"
     - mysql_group: "mysql"
   tasks:
@@ -43,9 +43,9 @@
           - PyMySQL
     - name: collect data from ssm
       set_fact:
-        db_root: "{{ lookup('aws_ssm', '/rbt/db/mysql/db_root_user', region='eu-central-1', shortnames=true, bypath=true, recursive=true) }}"
-        wp_db: "{{ lookup('aws_ssm', '/rbt/app/wordpress/wp_db_user', region='eu-central-1', shortnames=true, bypath=true, recursive=true) }}"
-        wp_db_name: "{{ lookup('aws_ssm', '/rbt/app/wordpress/db', region='eu-central-1', shortnames=true, bypath=true, recursive=true) }}"
+        db_root: "{{ lookup('aws_ssm', '${DB_ROOT_SSM}', region='${REGION}', shortnames=true, bypath=true, recursive=true) }}"
+        wp_db: "{{ lookup('aws_ssm', '${WP_DB_SSM}', region='${REGION}', shortnames=true, bypath=true, recursive=true) }}"
+        wp_db_name: "{{ lookup('aws_ssm', '${WP_DB_NAME_SSM}', region='${REGION}', shortnames=true, bypath=true, recursive=true) }}"
       no_log: True
     - name: create db and user
       block:

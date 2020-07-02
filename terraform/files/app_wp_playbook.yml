@@ -4,8 +4,8 @@
   connection: local
   gather_facts: no
   vars:
-    wp_dir: "/var/www/html"
-    admin_mail: "noreplay@noreply.com"
+    wp_dir: "${WPDIR}"
+    admin_mail: "${ADMIN_MAIL}"
   tasks:
     - name: install needed software
       yum:
@@ -21,10 +21,10 @@
           - botocore
     - name: collect data from ssm
       set_fact:
-        wp_db: "{{ lookup('aws_ssm', '/rbt/app/wordpress/wp_db_user', region='eu-central-1', shortnames=true, bypath=true, recursive=true) }}"
-        wp_db_name: "{{ lookup('aws_ssm', '/rbt/app/wordpress/db', region='eu-central-1', shortnames=true, bypath=true, recursive=true) }}"
-        wp_admin: "{{ lookup('aws_ssm', '/rbt/app/wordpress/wp_admin', region='eu-central-1', shortnames=true, bypath=true, recursive=true) }}"
-        wp_blog: "{{ lookup('aws_ssm', '/rbt/app/wordpress/blog', region='eu-central-1', shortnames=true, bypath=true, recursive=true) }}"
+        wp_db: "{{ lookup('aws_ssm', '${WP_DB_SSM}', region='${REGION}', shortnames=true, bypath=true, recursive=true) }}"
+        wp_db_name: "{{ lookup('aws_ssm', '${WP_DB_NAME_SSM}', region='${REGION}', shortnames=true, bypath=true, recursive=true) }}"
+        wp_admin: "{{ lookup('aws_ssm', '${WP_ADMIN_SSM}', region='${REGION}', shortnames=true, bypath=true, recursive=true) }}"
+        wp_blog: "{{ lookup('aws_ssm', '${WP_BLOG_SSM}', region='${REGION}', shortnames=true, bypath=true, recursive=true) }}"
       no_log: True
     - name: install and configure wordpress
       shell: "{{ item }}"

@@ -57,3 +57,13 @@ variable "wp_admin_user" {
   description = "Username of wordpress administrator"
   default = "wpadmin"
 }
+
+variable "wp_root_dir" {
+  description = "root dir for wordpress installation"
+  default = "/var/www/html"
+}
+
+variable "db_root_dir" {
+  description = "database root directory"
+  default = "/var/lib/mysql"
+}
