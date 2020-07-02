@@ -55,7 +55,7 @@ resource "aws_ssm_parameter" "ssm_wp_db_name" {
 ## write dh host to ssm
 resource "aws_ssm_parameter" "ssm_wp_db_host" {
   name  = "/${var.project}/app/wordpress/db/host"
-  type = "String"
+  type  = "String"
   value = aws_instance.db_host.private_dns
 }
 
@@ -78,8 +78,8 @@ resource "aws_instance" "db_host" {
   availability_zone      = local.avz_map.avz1
   key_name               = aws_key_pair.deployer.key_name
   user_data_base64       = base64encode(data.template_file.tpl_db_user_data.rendered)
-  volume_tags = merge({ "Name" : "${var.project}_ebs_db_host" }, local.common_tags)
-  tags        = merge({ "Name" : "${var.project}_db_host" }, local.common_tags)
+  volume_tags            = merge({ "Name" : "${var.project}_ebs_db_host" }, local.common_tags)
+  tags                   = merge({ "Name" : "${var.project}_db_host" }, local.common_tags)
 }
 
 ## Create persistent EBS volume for DB
