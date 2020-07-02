@@ -1,5 +1,5 @@
 ---
-- name: configure machine for db host
+- name: configure db host
   hosts: localhost
   connection: local
   gather_facts: no
@@ -7,6 +7,7 @@
     - db_dir: "${DB_ROOT_DIR}"
     - mysql_user: "mysql"
     - mysql_group: "mysql"
+    - project: "${PROJECT}"
   tasks:
     - name: create file system
       filesystem:
@@ -30,33 +31,46 @@
         owner: '{{ mysql_user }}'
         group: '{{ mysql_group }}'
         mode: '1755'
-    - name: start mariadb server
+    - name: start mariadb
       service:
         name: mariadb
         state: started
         enabled: yes
-    - name: install pip packages
+    - name: install pip
       pip:
         name:
           - boto3
           - botocore
           - PyMySQL
-    - name: collect data from ssm
+    - name: ssm data
       set_fact:
         db_root: "{{ lookup('aws_ssm', '${DB_ROOT_SSM}', region='${REGION}', shortnames=true, bypath=true, recursive=true) }}"
         wp_db: "{{ lookup('aws_ssm', '${WP_DB_SSM}', region='${REGION}', shortnames=true, bypath=true, recursive=true) }}"
         wp_db_name: "{{ lookup('aws_ssm', '${WP_DB_NAME_SSM}', region='${REGION}', shortnames=true, bypath=true, recursive=true) }}"
       no_log: True
+    - name: get facts
+      uri:
+        url: "http://169.254.169.254/latest/dynamic/instance-identity/document"
+        return_content: true
+        headers:
+          Content-type: "application/json"
+      register: result
+    - name: set hostname
+      hostname:
+        name: "{{ result.json.instanceId }}"
+    - name: set tag
+      shell: |
+        aws ec2 create-tags --region "{{ result.json.region }}" --resources "{{ result.json.instanceId }}" --tags Key=Name,Value="{{ project }}-{{ result.json.pendingTime }}"
     - name: create db and user
       block:
-        - name: try connection to localhost SQL DB
+        - name: connect localhost
           mysql_db:
             login_user: "{{ wp_db.user }}"
             login_password: "{{ wp_db.password }}"
             name: "{{ wp_db_name.name }}"
             connect_timeout: 10
       rescue:
-        - name: create DB admin user
+        - name: create DB admin
           mysql_user:
             check_implicit_admin: yes
             connect_timeout: 10
@@ -64,14 +78,12 @@
             password: "{{ db_root.password }}"
             priv: "*.*:ALL,GRANT"
             state: present
-
         - name: create DB
           mysql_db:
             login_user: "{{ db_root.user }}"
             login_password: "{{ db_root.password }}"
             name: "{{ wp_db_name.name }}"
             state: present
-
         - name: create user
           mysql_user:
             check_implicit_admin: yes
