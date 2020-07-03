@@ -58,9 +58,6 @@
     - name: set hostname
       hostname:
         name: "{{ result.json.instanceId }}"
-    - name: set tag
-      shell: |
-        aws ec2 create-tags --region "{{ result.json.region }}" --resources "{{ result.json.instanceId }}" --tags Key=Name,Value="{{ project }}-db-{{ result.json.pendingTime }}"
     - name: change root pw
       mysql_user:
         name: "{{ db_root.user }}"
