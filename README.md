@@ -47,12 +47,12 @@ Steps:
    Copy the id 
 1. cd to `terraform` dir and paste the id into `terraform/state.tf` as `bucket` parameter value
 1. open `terraform.tfvars` file to edit configuration variables:
- * `aws_region`
- * `vpc_subnet`
- * `applicant` - used for tagging
- * `project` - used for tagging
- * `public_nets`
- * `private_nets`
+     * `aws_region`
+     * `vpc_subnet`
+     * `applicant` - used for tagging
+     * `project` - used for tagging
+     * `public_nets`
+     * `private_nets`
 1. run `terraform init`
 2. run `terraform plan`. Validate the plan
 2. run `terraform apply` and one prompted for confirmation type in `yes`
