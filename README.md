@@ -35,6 +35,13 @@ Steps:
 1. Make sure you have valid credentials for your AWS account in $HOME/.aws directory and/our your correct credentials are loaded
 1. Clone current repo
 1. cd to the `terraform` directory
+1. open `terraform.tfvars` file to edit configuration variables:
+ * `aws_region`
+ * `vpc_subnet`
+ * `applicant` - used for tagging
+ * `project` - used for tagging
+ * `public_nets`
+ * `private_nets`
 1. run `terraform init`
 2. run `terraform plan`. Validate the plan
 2. run `terraform apply` and one prompted for confirmation type in `yes`
