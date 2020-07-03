@@ -31,10 +31,21 @@ Then during Ansible playbook execution, parameters are automatically obtained an
 For the sake of simplicity installation is only reachable via **http** and not *https*
 
 Steps:
-
-1. Make sure you have valid credentials for your AWS account in $HOME/.aws directory and/our your correct credentials are loaded
+##### Remote terraform.state file
+1. Make sure you have valid credentials for your AWS account in $HOME/.aws directory and/our your correct credentials are loaded (for example with tools like `awsume`)
 1. Clone current repo
-1. cd to the `terraform` directory
+1. cd to the `state` directory
+1. Frist step is to craete the S3 bucket that will be holding the remote state. Open `terraform.tfvars` and edit respective parameters. Make sure to use only URL friendly symbols.
+1. Run `terraform init` to initialize
+1. Run `terraform plan` to check correct configuratin.
+1. Now apply the configuratin with `terraform apply` and type in `yes` when prompted
+1. Upon successfull completion you'll see the just created S3 bucket ID:
+   ```
+   aws_s3_bucket.terraform_state: Creating...  
+   aws_s3_bucket.terraform_state: Creation complete after 6s [id=XXXXXXXXX]
+   ``` 
+   Copy the id 
+1. cd to `terraform` dir and paste the id into `terraform/state.tf` as `bucket` parameter value
 1. open `terraform.tfvars` file to edit configuration variables:
  * `aws_region`
  * `vpc_subnet`
@@ -47,8 +58,10 @@ Steps:
 2. run `terraform apply` and one prompted for confirmation type in `yes`
 3. After successful completion, URL for accessing your Wordpress installation along with wpadmin credentials will be printed.
 
+
 Due to the needed time for actual bootstrap process, service might need some time to start. During that time you may see `502 Bad Gateway` error. Try refreshing in couple of minutes.
 
 Destroying everything including the built infra is as easy as:
 `terraform destroy`
+Thanks to the share remote state file, various team members are able to work on the project semi-simultaneously without messing up with the already built infra.
 
