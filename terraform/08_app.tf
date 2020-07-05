@@ -1,10 +1,3 @@
-#upload ansible wp play to SSM
-//resource "aws_ssm_parameter" "app_ansible_play" {
-//  name  = "/rbt/app/wordpress/setup/ansible"
-//  type  = "String"
-//  value = base64encode(data.template_file.tpl_ansible_app.rendered)
-//}
-
 # write wp_admin username to SSM
 resource "aws_ssm_parameter" "ssm_wp_admin_user" {
   name  = "/${var.project}/app/wordpress/wp_admin/user"

@@ -2,7 +2,6 @@
 playbook="/tmp/db_ansible.yml"
 region="${REGION}"
 amazon-linux-extras install ansible2
-#aws ssm get-parameter --name "$ssm_param" --region=$region --query Parameter.Value --output text |base64 -d > $playbook
 cat > $playbook << EOPB
 ---
 - name: configure db host

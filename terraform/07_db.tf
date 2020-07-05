@@ -59,16 +59,6 @@ resource "aws_ssm_parameter" "ssm_wp_db_host" {
   value = aws_instance.db_host.private_dns
 }
 
-//#copy ansible playbook to SSM parameter store
-//resource "aws_ssm_parameter" "ssm_ansible_db_playbook" {
-//  name  = "/${var.project}/db/setup/ansible"
-//  type  = "String"
-//  value = base64encode(data.template_file.tpl_ansible_db.rendered)
-//  tags  = local.common_tags
-//}
-
-
-
 resource "aws_instance" "db_host" {
   ami                    = data.aws_ami.latest_lx_ami.id
   instance_type          = var.db_inst_type
