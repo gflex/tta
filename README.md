@@ -11,8 +11,9 @@ Solution is based on Terraform and Ansible, used for building AWS infrastructue 
 With terraform we:
 1. Create a new VPC
 1. Create 2 from each public (public access), application and DB subnets (private) in two availability zones.
-1. Create respective Internet gateway and NAT gateway for private nets
-1. Fix routing
+1. Create  Internet gateway
+1. Create NAT gateway in each public net (respectively in each availability zone)
+1. Fix routing. Each subnet goes Internet via its availability zone's NAT Gateway
 1. Create security groups allowing only the minimal traffic between respective networks part of the security groups
 1. Create IAM roles, profiles and attach respective policies.
 1. Configure System Manager's Session manager in order to reach instances over SSM and not opening SSH public access to the instances.
