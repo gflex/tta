@@ -57,7 +57,7 @@ Steps:
 1. run `terraform init`
 2. run `terraform plan`. Validate the plan
 2. run `terraform apply` and one prompted for confirmation type in `yes`
-3. After successful completion, URL for accessing your Wordpress installation along with wpadmin credentials will be printed.
+3. After successful completion, URL for accessing your Wordpress installation will be printed. By default, password is hidden as sensitive data. Hence, to reveal it run `terraform output wp_admin_password`
 
 
 Due to the needed time for actual bootstrap process, service might need some time to start. During that time you may see `502 Bad Gateway` error. Try refreshing in couple of minutes.
