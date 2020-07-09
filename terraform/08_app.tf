@@ -34,8 +34,7 @@ resource "aws_launch_template" "lt_app" {
     enabled = true
   }
   vpc_security_group_ids = [aws_security_group.sg_app.id]
-  //key_name               = aws_key_pair.deployer.key_name
-  user_data              = base64encode(data.template_file.tpl_app_user_data.rendered)
+  user_data = base64encode(data.template_file.tpl_app_user_data.rendered)
   tag_specifications {
     resource_type = "volume"
     tags          = merge({ "Name" : "${var.project}_app_volume" }, local.common_tags)
@@ -64,7 +63,7 @@ resource "aws_alb" "alb" {
   name               = "${var.project}-alb"
   load_balancer_type = "application"
   security_groups    = [aws_security_group.sg_elb.id]
-  subnets            = module.public_subnets.subnets_ids
+  subnets            = [for i in aws_subnet.public_subnets : i.id]
   tags               = merge({ "Name" : "${var.project}-alb" }, local.common_tags)
 }
 
@@ -103,21 +102,21 @@ resource "aws_autoscaling_group" "asg" {
   force_delete              = true
   default_cooldown          = 120
   placement_group           = aws_placement_group.wp_pl_grp.name
-  vpc_zone_identifier       = module.app_subnets.subnets_ids
+  vpc_zone_identifier       = [for i in aws_subnet.app_subnets : i.id]
   target_group_arns         = [aws_lb_target_group.alb_tgtGroup.arn]
   launch_template {
     id      = aws_launch_template.lt_app.id
     version = "$Latest"
   }
   tag {
-    key = "project"
-    value = var.project
+    key                 = "project"
+    value               = var.project
     propagate_at_launch = true
   }
   tag {
-    key = "applicant"
+    key                 = "applicant"
     propagate_at_launch = true
-    value = var.applicant
+    value               = var.applicant
   }
 }
 

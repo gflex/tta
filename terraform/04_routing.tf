@@ -1,54 +1,66 @@
-// add pub net default gateway via internet gateway
-//Create routing table for public subnets
-module "pub_net_routing_table" {
-  source        = "./modules/routing"
-  m_vpc_id      = aws_vpc.vpc.id
-  m_subn_count  = length(module.public_subnets.subnets_ids)
-  m_subnets_ids = module.public_subnets.subnets_ids
-  m_rt_name     = "${var.project}_pub_nets_rt_tbl"
-  m_tags        = merge({ "Name" : "${var.project}_pub_net_rt" }, local.common_tags)
+## Public network
+##create routing table for public networks
+resource "aws_route_table" "pub_routing_table" {
+  vpc_id = aws_vpc.vpc.id
+  tags   = merge({ "Name" : "pub_rtb" }, local.common_tags)
+}
+#create association pub nets to pub routing table
+resource "aws_route_table_association" "pub_routing_table" {
+  count          = length(aws_subnet.public_subnets)
+  route_table_id = aws_route_table.pub_routing_table.id
+  subnet_id      = aws_subnet.public_subnets[count.index].id
 }
 
-// add pub net default gateway via internet gateway
-resource "aws_route" "pub_net_dg" {
-  route_table_id         = module.pub_net_routing_table.rt_id
-  destination_cidr_block = "0.0.0.0/0"
+## Add routing to Internet for pub net
+resource "aws_route" "pub_net_routing" {
+  route_table_id         = aws_route_table.pub_routing_table.id
   gateway_id             = aws_internet_gateway.gw.id
-  depends_on             = [module.pub_net_routing_table.rt_id]
-}
-
-
-// create routing table for App network (private)
-module "app_net_routing_table" {
-  source        = "./modules/routing"
-  m_vpc_id      = aws_vpc.vpc.id
-  m_subnets_ids = module.app_subnets.subnets_ids
-  m_rt_name     = "${var.project}_app_rt_tbl"
-  m_subn_count  = length(module.app_subnets.subnets_ids)
-  m_tags        = merge({ "Name" : "${var.project}_app_net_rt" }, local.common_tags)
-}
-
-// add default route for wordpress net to wordpress nat gateway
-resource "aws_route" "app_net_dg" {
-  route_table_id         = module.app_net_routing_table.rt_id
   destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = aws_nat_gateway.app_nat_gw.id
-  depends_on             = [module.app_net_routing_table.rt_id]
 }
 
-// Routing table for RDS network
-module "rds_net_routing_table" {
-  source        = "./modules/routing"
-  m_vpc_id      = aws_vpc.vpc.id
-  m_subnets_ids = module.rds_subnets.subnets_ids
-  m_rt_name     = "${var.project}_rds_rt_tbl"
-  m_subn_count  = length(module.rds_subnets.subnets_ids)
-  m_tags        = merge({ "Name" : "${var.project}_rds_net_rt" }, local.common_tags)
+
+## Applicaiton network
+## Create routing tables
+resource "aws_route_table" "app_routing_table" {
+  count  = length(data.aws_availability_zones.available.names)
+  vpc_id = aws_vpc.vpc.id
+  tags   = merge({ "Name" : "app_rt_${substr(data.aws_availability_zones.available.names[count.index], -1, 1)}" }, local.common_tags)
 }
 
-resource "aws_route" "rds_net_dg" {
-  route_table_id         = module.rds_net_routing_table.rt_id
+resource "aws_route_table_association" "app_routing_table" {
+  count          = length(aws_subnet.app_subnets)
+  route_table_id = aws_route_table.app_routing_table[count.index].id
+  subnet_id      = aws_subnet.app_subnets[count.index].id
+}
+
+resource "aws_route" "app_net_route" {
+  count                  = length(aws_subnet.app_subnets)
+  nat_gateway_id         = aws_nat_gateway.nat_gw[count.index].id
   destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = aws_nat_gateway.app_nat_gw.id
-  depends_on             = [module.app_net_routing_table.rt_id]
+  route_table_id         = aws_route_table.app_routing_table[count.index].id
+}
+
+
+## RDS network
+## ROuting table
+resource "aws_route_table" "rds_routing_table" {
+  count  = length(data.aws_availability_zones.available.names)
+  vpc_id = aws_vpc.vpc.id
+  tags   = merge({ "Name" : "rds_rt_${substr(data.aws_availability_zones.available.names[count.index], -1, 1)}" }, local.common_tags)
+}
+
+
+## Routing association
+resource "aws_route_table_association" "rds_routing_table" {
+  count          = length(aws_subnet.rds_subnets)
+  route_table_id = aws_route_table.rds_routing_table[count.index].id
+  subnet_id      = aws_subnet.rds_subnets[count.index].id
+}
+
+## NAT gateway
+resource "aws_route" "rds_net_route" {
+  count                  = length(aws_subnet.rds_subnets)
+  nat_gateway_id         = aws_nat_gateway.nat_gw[count.index].id
+  destination_cidr_block = "0.0.0.0/0"
+  route_table_id         = aws_route_table.rds_routing_table[count.index].id
 }

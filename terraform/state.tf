@@ -3,10 +3,10 @@ provider "aws" {
 }
 
 terraform {
-  required_version = ">= 0.12.25"
+  required_version = ">= 0.12.26"
   required_providers {
-    aws      = ">= 2.60"
     template = ">= 2.1"
+    aws      = ">= 2.68"
   }
 }
 

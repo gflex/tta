@@ -4,8 +4,9 @@ data "aws_vpc" "default" {
 
 #obtain available availability zones in the reqion
 data "aws_availability_zones" "available" {
-  state             = "available"
-  blacklisted_names = ["*c"]
+  state         = "available"
+  exclude_names = ["eu-central-1c"]
+
 }
 
 data "template_file" "tmpl_role_ec2_ssm" {
@@ -37,7 +38,7 @@ data "aws_ami" "latest_lx_ami" {
 data template_file "tpl_db_user_data" {
   template = file("files/db_user_data.sh")
   vars = {
-    REGION         = var.aws_region
+    REGION = var.aws_region
     #ANS_APP_SSM    = "/rbt/db/setup/ansible"
     PROJECT        = var.project
     DB_ROOT_DIR    = var.db_root_dir
@@ -51,7 +52,7 @@ data template_file "tpl_db_user_data" {
 data "template_file" "tpl_app_user_data" {
   template = file("files/app_user_data.sh")
   vars = {
-    REGION         = var.aws_region
+    REGION = var.aws_region
     //ANS_APP_SSM    = "/rbt/app/wordpress/setup/ansible"
     WPDIR          = var.wp_root_dir
     PROJECT        = var.project

@@ -63,10 +63,9 @@ resource "aws_instance" "db_host" {
   ami                    = data.aws_ami.latest_lx_ami.id
   instance_type          = var.db_inst_type
   vpc_security_group_ids = [aws_security_group.sg_rds.id]
-  subnet_id              = module.rds_subnets.subnets_ids.0
+  subnet_id              = aws_subnet.rds_subnets[0].id
   iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
-  availability_zone      = local.avz_map.avz1
-  //key_name               = aws_key_pair.deployer.key_name
+  availability_zone      = data.aws_availability_zones.available.names[0]
   user_data_base64       = base64encode(data.template_file.tpl_db_user_data.rendered)
   volume_tags            = merge({ "Name" : "${var.project}_ebs_db_vol" }, local.common_tags)
   tags                   = merge({"Name" : "${var.project}_db_host"}, local.common_tags)
@@ -74,7 +73,7 @@ resource "aws_instance" "db_host" {
 
 ## Create persistent EBS volume for DB
 resource "aws_ebs_volume" "ebs_db_data" {
-  availability_zone = local.avz_map.avz1
+  availability_zone = data.aws_availability_zones.available.names[0]
   size              = "10"
   tags              = merge({ "Name" : "${var.project}_ebs_db_vol" }, local.common_tags)
 }

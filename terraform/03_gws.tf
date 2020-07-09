@@ -7,16 +7,18 @@ resource "aws_internet_gateway" "gw" {
 
 ## allocate EIP for APP net NGW
 resource "aws_eip" "eip_nat_gw" {
-  vpc  = true
-  tags = merge({ "Name" : "${var.project}_eip_nat" }, local.common_tags)
+  count = length(data.aws_availability_zones.available.names)
+  vpc   = true
+  tags  = merge({ "Name" : "eip_${substr(data.aws_availability_zones.available.names[count.index], -1, 1)}" }, local.common_tags)
 }
 
 
 # Create NAT GW for outbound traffic
 
-resource "aws_nat_gateway" "app_nat_gw" {
-  allocation_id = aws_eip.eip_nat_gw.id #associate former allocated EIP
-  subnet_id     = module.public_subnets.subnets_ids.0
+resource "aws_nat_gateway" "nat_gw" {
+  count         = length(aws_subnet.public_subnets)
+  allocation_id = aws_eip.eip_nat_gw[count.index].id #associate former allocated EIP
+  subnet_id     = aws_subnet.public_subnets[count.index].id
   depends_on    = [aws_internet_gateway.gw]
-  tags          = merge({ "Name" : "${var.project}_nat_gw" }, local.common_tags)
+  tags          = merge({ "Name" : "nat_gw_${substr(aws_subnet.public_subnets[count.index].availability_zone,-1,1)}" }, local.common_tags)
 }

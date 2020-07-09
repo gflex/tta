@@ -1,17 +1,7 @@
-variable "vpc_subnet" {
-  default = "vpc_subnet"
-}
-
-variable "aws_region" {
-  default = "aws_region"
-}
-variable "applicant" {
-  default = "applicant"
-}
-
-variable "project" {
-  default = "project"
-}
+variable "vpc_subnet" {}
+variable "aws_region" {}
+variable "applicant" {}
+variable "project" {}
 
 locals {
   common_tags = {
@@ -20,13 +10,16 @@ locals {
   }
 }
 
-variable "public_nets" {
-  default = "public_nets"
+variable "pub_nets" {
+  description = "public network whene load balancers will reside"
+}
+variable "app_nets" {
+  description = "application network where web servers reside"
+}
+variable "rds_nets" {
+  description = "network for the DB hosts/services"
 }
 
-variable "private_nets" {
-  default = "private_nets"
-}
 
 variable "db_inst_type" {
   description = "Instance type for DB host"
@@ -34,7 +27,7 @@ variable "db_inst_type" {
 }
 
 variable "app_inst_type" {
-  description = "ec2 insance type for the web servers"
+  description = "ec2 instance type for the web servers"
   default     = "t2.micro"
 }
 
