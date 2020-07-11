@@ -79,7 +79,7 @@ resource "aws_lb_listener" "alb_listener" {
 
 #s# upload the LB url to SSM (used for wp setup)
 resource "aws_ssm_parameter" "dns_url" {
-  name  = "/rbt/app/wordpress/wp_db_user/url"
+  name  = "/${var.project}/app/wordpress/wp_db_user/url"
   type  = "String"
   value = aws_alb.alb.dns_name
 }
@@ -121,7 +121,7 @@ resource "aws_autoscaling_group" "asg" {
 }
 
 resource "aws_ssm_parameter" "blog_post" {
-  name  = "/rbt/app/wordpress/blog/post1"
+  name  = "/${var.project}/app/wordpress/blog/post1"
   type  = "String"
   value = file("files/blog_post.txt")
 }
