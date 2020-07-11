@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -e
 playbook="/tmp/wp_ansible.yml"
-region="${REGION}"
 amazon-linux-extras install -y ansible2
 cat > $playbook << EOPB
 ---
@@ -29,6 +28,7 @@ cat > $playbook << EOPB
           - boto3
           - botocore
           - PyMySQL
+
     - name: get ssm data
       set_fact:
         wp_db: "{{ lookup('aws_ssm', '${WP_DB_SSM}', region='${REGION}', shortnames=true, bypath=true, recursive=true) }}"
@@ -90,6 +90,7 @@ cat > $playbook << EOPB
         aws ec2 create-tags --region "{{ result.json.region }}" --resources "{{ result.json.instanceId }}" --tags Key=Name,Value="{{ project }}-wp-{{ result.json.pendingTime }}"
         wp post update 1 --path="{{ wp_dir }}" --post_content="{{ wp_blog.post1 }}" --post_title="Linux namespaces" --post_name="Linux namespaces" --post_status=publish --post_author="{{ wp_admin.user }}"
         wp comment delete 1 --path="{{ wp_dir }}" || true
+
 EOPB
 /usr/bin/ansible-playbook $playbook
 rm $playbook

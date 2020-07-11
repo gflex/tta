@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 playbook="/tmp/db_ansible.yml"
-region="${REGION}"
-amazon-linux-extras install ansible2
+amazon-linux-extras install -y ansible2
 cat > $playbook << EOPB
 ---
 - name: configure db host
