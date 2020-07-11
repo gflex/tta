@@ -1,6 +1,6 @@
 #create public subnets
 resource "aws_subnet" "public_subnets" {
-  count                   = "${length(data.aws_availability_zones.available.names)-1}"
+  count                   = length(var.pub_nets)
   cidr_block              = var.pub_nets[count.index]
   availability_zone       = data.aws_availability_zones.available.names[count.index]
   vpc_id                  = aws_vpc.vpc.id
@@ -10,7 +10,7 @@ resource "aws_subnet" "public_subnets" {
 
 //Create application networkds
 resource "aws_subnet" "app_subnets" {
-  count                   = "${length(data.aws_availability_zones.available.names)-1}"
+  count                   = length(var.app_nets)
   cidr_block              = var.app_nets[count.index]
   availability_zone       = data.aws_availability_zones.available.names[count.index]
   vpc_id                  = aws_vpc.vpc.id
@@ -19,7 +19,7 @@ resource "aws_subnet" "app_subnets" {
 }
 //create RDS networks
 resource "aws_subnet" "rds_subnets" {
-  count                   = "${length(data.aws_availability_zones.available.names)-1}"
+  count                   = length(var.rds_nets)
   cidr_block              = var.rds_nets[count.index]
   availability_zone       = data.aws_availability_zones.available.names[count.index]
   vpc_id                  = aws_vpc.vpc.id

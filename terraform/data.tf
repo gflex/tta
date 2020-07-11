@@ -5,7 +5,6 @@ data "aws_vpc" "default" {
 #obtain available availability zones in the reqion
 data "aws_availability_zones" "available" {
   state         = "available"
-  exclude_names = ["*c"]
 }
 
 data "template_file" "tmpl_role_ec2_ssm" {
