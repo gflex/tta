@@ -2,6 +2,13 @@ provider "aws" {
   region = var.aws_region
 }
 
+terraform {
+  required_version = ">= 0.12.26"
+  required_providers {
+    aws      = ">= 2.68"
+  }
+}
+
 resource "aws_s3_bucket" "terraform_state" {
   bucket = "${var.project}-${var.applicant}-tf-remote-state-bucket"
   versioning {
