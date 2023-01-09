@@ -66,9 +66,17 @@ resource "aws_instance" "db_host" {
   subnet_id              = aws_subnet.rds_subnets[0].id
   iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
   availability_zone      = data.aws_availability_zones.available.names[0]
-  user_data_base64       = base64encode(data.template_file.tpl_db_user_data.rendered)
-  volume_tags            = merge({ "Name" : "${var.project}_ebs_db_vol" }, local.common_tags)
-  tags                   = merge({"Name" : "${var.project}_db_host"}, local.common_tags)
+  user_data_base64 = base64encode(templatefile("files/db_user_data.sh",
+    {
+      REGION         = var.aws_region
+      PROJECT        = var.project
+      DB_ROOT_DIR    = var.db_root_dir
+      DB_ROOT_SSM    = "/${var.project}/db/mysql/db_root_user"
+      WP_DB_SSM      = "/${var.project}/app/wordpress/wp_db_user"
+      WP_DB_NAME_SSM = "/${var.project}/app/wordpress/db"
+  }))
+  volume_tags = merge({ "Name" : "${var.project}_ebs_db_vol" }, local.common_tags)
+  tags        = merge({ "Name" : "${var.project}_db_host" }, local.common_tags)
 }
 
 ## Create persistent EBS volume for DB

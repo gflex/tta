@@ -34,7 +34,17 @@ resource "aws_launch_template" "lt_app" {
     enabled = true
   }
   vpc_security_group_ids = [aws_security_group.sg_app.id]
-  user_data = base64encode(data.template_file.tpl_app_user_data.rendered)
+  user_data = base64encode(templatefile("files/app_user_data.sh",
+    {
+      REGION         = var.aws_region
+      WPDIR          = var.wp_root_dir
+      PROJECT        = var.project
+      ADMIN_MAIL     = "noreply@noreply.com"
+      WP_DB_SSM      = "/${var.project}/app/wordpress/wp_db_user"
+      WP_DB_NAME_SSM = "/${var.project}/app/wordpress/db"
+      WP_ADMIN_SSM   = "/${var.project}/app/wordpress/wp_admin"
+      WP_BLOG_SSM    = "/${var.project}/app/wordpress/blog"
+  }))
   tag_specifications {
     resource_type = "volume"
     tags          = merge({ "Name" : "${var.project}_app_volume" }, local.common_tags)
@@ -87,8 +97,9 @@ resource "aws_ssm_parameter" "dns_url" {
 
 #create placement group
 resource "aws_placement_group" "wp_pl_grp" {
-  name     = "${var.project}-wp-pl-grp"
-  strategy = "spread"
+  name         = "${var.project}-wp-pl-grp"
+  strategy     = "spread"
+  spread_level = "rack"
 }
 # create autoscaling group
 ## tbd

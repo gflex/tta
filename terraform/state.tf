@@ -5,9 +5,6 @@ provider "aws" {
 terraform {
   required_version = "~>1"
   required_providers {
-    template = {
-      version = "~>3" 
-    }
     aws = {
       version = "~>4"
     }
@@ -16,9 +13,9 @@ terraform {
 
 terraform {
   backend "s3" {
-    bucket  = ""
-    key     = ""
-    region  = ""
+    bucket  = "test-rbt-gvi-tf-remote-state-bucket"
+    key     = "state/gvi/dev/"
+    region  = "eu-west-1"
     encrypt = true
   }
 }

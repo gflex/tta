@@ -1,5 +1,5 @@
 output "Wordpress_URL" {
-  value =  "http://${aws_alb.alb.dns_name}"
+  value = "http://${aws_alb.alb.dns_name}"
 }
 
 output "wp_admin" {
@@ -7,6 +7,6 @@ output "wp_admin" {
 }
 
 output "wp_admin_password" {
-  value = random_password.wp_admin_pass.result
-  sensitive = true
+  value     = nonsensitive(random_password.wp_admin_pass.result)
+  sensitive = false
 }
