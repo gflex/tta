@@ -2,8 +2,8 @@
 variable "aws_region" {
   default = "aws_region"
 }
-variable "applicant" {
-  default = "applicant"
+variable "user" {
+  default = "user"
 }
 
 variable "project" {
@@ -12,7 +12,7 @@ variable "project" {
 
 locals {
   common_tags = {
-    applicant = var.applicant
+    user    = var.user
     project = var.project
   }
 }

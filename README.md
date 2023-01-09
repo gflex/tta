@@ -1,5 +1,5 @@
 ## Description
-RBT project for Georgi Ivanov
+tta project for Georgi Ivanov
 
 ### Task
 
@@ -50,7 +50,7 @@ Steps:
 1. open `terraform.tfvars` file to edit configuration variables:
      * `aws_region`
      * `vpc_subnet`
-     * `applicant` - used for tagging
+     * `user` - used for tagging
      * `project` - used for tagging
      * `public_nets`
      * `private_nets`

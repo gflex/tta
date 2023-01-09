@@ -1,3 +1,3 @@
 aws_region = ""
-applicant  = ""
+user       = ""
 project    = ""

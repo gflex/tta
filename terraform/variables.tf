@@ -1,12 +1,12 @@
 variable "vpc_subnet" {}
 variable "aws_region" {}
-variable "applicant" {}
+variable "user" {}
 variable "project" {}
 
 locals {
   common_tags = {
-    applicant = var.applicant
-    project   = var.project
+    user    = var.user
+    project = var.project
   }
 }
 

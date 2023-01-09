@@ -16,7 +16,7 @@ terraform {
 }
 
 resource "aws_s3_bucket" "terraform_state" {
-  bucket = "${var.project}-${var.applicant}-tf-remote-state-bucket"
+  bucket = "${var.project}-${var.user}-tf-remote-state-bucket"
 }
 
 resource "aws_s3_bucket_versioning" "terraform_state" {

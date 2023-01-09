@@ -1,6 +1,6 @@
 vpc_subnet = ""
 aws_region = ""
-applicant  = ""
+user       = ""
 project    = ""
 pub_nets   = ["", ""]
 app_nets   = ["", ""]

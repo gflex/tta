@@ -125,9 +125,9 @@ resource "aws_autoscaling_group" "asg" {
     propagate_at_launch = true
   }
   tag {
-    key                 = "applicant"
+    key                 = "user"
     propagate_at_launch = true
-    value               = var.applicant
+    value               = var.user
   }
 }
 
