@@ -13,9 +13,9 @@ terraform {
 
 terraform {
   backend "s3" {
-    bucket  = "test-rbt-gvi-tf-remote-state-bucket"
-    key     = "state/gvi/dev/"
-    region  = "eu-west-1"
+    bucket  = ""
+    key     = ""
+    region  = ""
     encrypt = true
   }
 }
